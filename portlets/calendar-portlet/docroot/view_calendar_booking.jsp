@@ -49,18 +49,31 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 
 <aui:fieldset>
 	<dl class="property-list">
-		<dt>
-			<liferay-ui:message key="start-date" />:
-		</dt>
-		<dd>
-			<%= dateFormatLongDate.format(startTimeJCalendar.getTime()) + ", " + dateFormatTime.format(startTimeJCalendar.getTime()) %>
-		</dd>
-		<dt>
-			<liferay-ui:message key="end-date" />:
-		</dt>
-		<dd>
-			<%= dateFormatLongDate.format(endTimeJCalendar.getTime()) + ", " + dateFormatTime.format(endTimeJCalendar.getTime()) %>
-		</dd>
+
+		<c:choose>
+			<c:when test='<%= allDay %>'>
+				<dt>
+					<liferay-ui:message key="all-day" />:
+				</dt>
+				<dd>
+					<%= dateFormatLongDate.format(startTimeJCalendar.getTime()) %>
+				</dd>
+			</c:when>
+			<c:otherwise>
+				<dt>
+					<liferay-ui:message key="start-date" />:
+				</dt>
+				<dd>
+					<%= dateFormatLongDate.format(startTimeJCalendar.getTime()) + ", " + dateFormatTime.format(startTimeJCalendar.getTime()) %>
+				</dd>
+				<dt>
+					<liferay-ui:message key="end-date" />:
+				</dt>
+				<dd>
+					<%= dateFormatLongDate.format(endTimeJCalendar.getTime()) + ", " + dateFormatTime.format(endTimeJCalendar.getTime()) %>
+				</dd>
+			</c:otherwise>
+		</c:choose>
 
 		<%
 		List<CalendarBooking> childCalendarBookings = calendarBooking.getChildCalendarBookings();
