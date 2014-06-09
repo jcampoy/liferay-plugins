@@ -21,17 +21,23 @@ String backURL = ParamUtil.getString(request, "backURL");
 
 CalendarBooking calendarBooking = (CalendarBooking)request.getAttribute(WebKeys.CALENDAR_BOOKING);
 
+boolean allDay = BeanParamUtil.getBoolean(calendarBooking, request, "allDay");
+
+TimeZone calendarBookingTimeZone = userTimeZone;
+
+if (allDay) {
+	calendarBookingTimeZone = utcTimeZone;
+}
+
 Calendar calendar = calendarBooking.getCalendar();
 
 long startTime = BeanParamUtil.getLong(calendarBooking, request, "startTime");
 
-java.util.Calendar startTimeJCalendar = JCalendarUtil.getJCalendar(startTime, userTimeZone);
+java.util.Calendar startTimeJCalendar = JCalendarUtil.getJCalendar(startTime, calendarBookingTimeZone);
 
 long endTime = BeanParamUtil.getLong(calendarBooking, request, "endTime");
 
-java.util.Calendar endTimeJCalendar = JCalendarUtil.getJCalendar(endTime, userTimeZone);
-
-boolean allDay = BeanParamUtil.getBoolean(calendarBooking, request, "allDay");
+java.util.Calendar endTimeJCalendar = JCalendarUtil.getJCalendar(endTime, calendarBookingTimeZone);
 
 AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBooking.class.getName(), calendarBooking.getCalendarBookingId());
 %>
