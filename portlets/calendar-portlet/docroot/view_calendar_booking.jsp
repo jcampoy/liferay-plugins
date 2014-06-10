@@ -75,6 +75,14 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 			</c:otherwise>
 		</c:choose>
 
+		<c:if test="<%= calendarBooking.isRecurring() %>">
+			<dt>
+				<liferay-ui:message key="recurring" />:
+			</dt>
+			<dd id="<portlet:namespace />recurrence">
+			</dd>
+		</c:if>
+
 		<%
 		List<CalendarBooking> childCalendarBookings = calendarBooking.getChildCalendarBookings();
 		%>
@@ -209,3 +217,54 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 		submitForm(document.<portlet:namespace />fm);
 	}
 </aui:script>
+
+<c:if test="<%= calendarBooking.isRecurring() %>">
+	<aui:script use="liferay-calendar-recurrence-util">
+	function <portlet:namespace />getRecurrenceSummary() {
+
+			<%
+			Recurrence recurrence = calendarBooking.getRecurrenceObj();
+			%>
+
+			var endValue = 'never';
+
+			<c:choose>
+				<c:when test='<%= recurrence.getCount() > 0  %>'>
+					endValue = 'after';
+				</c:when>
+				<c:when test='<%= recurrence.getUntilJCalendar() != null %>'>
+					endValue = 'on';
+				</c:when>
+			</c:choose>
+
+			var untilDate = new Date();
+
+			<c:if test="<%= recurrence.getUntilJCalendar() != null %>">
+				untilDate = new Date(<%= recurrence.getUntilJCalendar().getTimeInMillis() %>);
+			</c:if>
+
+			var weekdays = [];
+
+			<%
+			for (Weekday weekday : recurrence.getWeekdays()) {
+			%>
+				weekdays.push('<%= LanguageUtil.get(pageContext, "weekday." + weekday.getValue()) %>');
+			<%
+			}
+			%>
+
+			var recurrence = {
+				count: <%= recurrence.getCount() %>,
+				endValue: endValue,
+				frequency: '<%= recurrence.getFrequency() %>',
+				interval: <%= recurrence.getInterval() %>,
+				untilDate: untilDate,
+				weekdays: weekdays
+			}
+
+			A.one('#<portlet:namespace />recurrence').html(Liferay.RecurrenceUtil.getSummary(recurrence));
+		}
+
+		<portlet:namespace />getRecurrenceSummary();
+	</aui:script>
+</c:if>
